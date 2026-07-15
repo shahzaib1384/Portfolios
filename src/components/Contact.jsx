@@ -10,14 +10,19 @@ export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
     
     setIsSubmitting(true);
+    setSubmitError("");
     
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
       const response = await fetch("https://formsubmit.co/ajax/shahzaib1384@gmail.com", {
         method: "POST",
         headers: { 
@@ -28,17 +33,25 @@ export default function Contact() {
             name: formData.name,
             email: formData.email,
             message: formData.message,
-            _subject: `New Portfolio Message from ${formData.name}`
-        })
+            _subject: `New Portfolio Message from ${formData.name}`,
+            _captcha: "false"
+        }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (response.ok) {
         setIsSuccess(true);
         setFormData({ name: "", email: "", message: "" });
         setTimeout(() => setIsSuccess(false), 2000);
+      } else {
+        throw new Error("FormSubmit rejected the request");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
+      setSubmitError("Failed to send message. Please try emailing me directly.");
+      setTimeout(() => setSubmitError(""), 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -245,6 +258,16 @@ export default function Contact() {
               </form>
 
               <AnimatePresence>
+                {submitError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 15 }}
+                    className="mt-6 p-4 rounded-xl bg-rose-950/40 border border-rose-500/30 flex items-center gap-3 text-rose-400 text-sm shadow-md"
+                  >
+                    <span>{submitError}</span>
+                  </motion.div>
+                )}
                 {isSuccess && (
                   <motion.div
                     initial={{ opacity: 0, y: 15 }}

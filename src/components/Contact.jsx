@@ -35,7 +35,7 @@ export default function Contact() {
       if (response.ok) {
         setIsSuccess(true);
         setFormData({ name: "", email: "", message: "" });
-        setTimeout(() => setIsSuccess(false), 5000);
+        setTimeout(() => setIsSuccess(false), 2000);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -204,14 +204,43 @@ export default function Contact() {
                   whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                   type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full py-4 px-6 text-sm font-semibold tracking-wider text-[#F1F5F9] bg-gradient-to-r from-[#4F8EF7] to-[#A855F7] rounded-xl hover:shadow-lg hover:shadow-[#4F8EF7]/20 transition-all duration-300 flex items-center justify-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting || isSuccess}
+                  className="w-full py-4 px-6 text-sm font-semibold tracking-wider text-[#F1F5F9] bg-gradient-to-r from-[#4F8EF7] to-[#A855F7] rounded-xl hover:shadow-lg hover:shadow-[#4F8EF7]/20 transition-all duration-300 flex items-center justify-center gap-2 shadow-md disabled:opacity-80 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? (
-                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  ) : (
-                    <><Send className="w-4 h-4" />Send Message</>
-                  )}
+                  <AnimatePresence mode="wait">
+                    {isSubmitting ? (
+                      <motion.span 
+                        key="submitting" 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }} 
+                        transition={{ duration: 0.2 }} 
+                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin flex-shrink-0" 
+                      />
+                    ) : isSuccess ? (
+                      <motion.div 
+                        key="success" 
+                        initial={{ scale: 0.8, opacity: 0 }} 
+                        animate={{ scale: 1, opacity: 1 }} 
+                        exit={{ scale: 0.8, opacity: 0 }} 
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }} 
+                        className="flex items-center gap-2"
+                      >
+                        <CheckCircle2 className="w-4 h-4" /> Message Sent
+                      </motion.div>
+                    ) : (
+                      <motion.div 
+                        key="default" 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }} 
+                        transition={{ duration: 0.2 }} 
+                        className="flex items-center gap-2"
+                      >
+                        <Send className="w-4 h-4" /> Send Message
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.button>
               </form>
 

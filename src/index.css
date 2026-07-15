@@ -35,7 +35,10 @@
 }
 
 .glass-card-hover {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card-hover:hover {
@@ -150,4 +153,19 @@ html {
 .section-reveal.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Focus state (keyboard navigation): soft glowing outline transitions in over 150ms */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.5);
+  transition: box-shadow 0.15s ease-out;
+}
+
+/* Responsive breakpoint transitions */
+.transition-layout {
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              padding 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              margin 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }

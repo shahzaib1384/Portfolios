@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion, animate } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { TRANSITIONS } from "../utils/motion";
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -68,7 +69,23 @@ export default function Navbar() {
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = target.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
-      window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
+      
+      if (shouldReduceMotion) {
+        window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
+      } else {
+        // Dim main content briefly to guide the eye
+        const mainContent = document.querySelector("main");
+        if (mainContent) {
+          animate(mainContent, { opacity: [1, 0.85, 1] }, { duration: TRANSITIONS.DURATION_SCROLL, ease: TRANSITIONS.EASE_OUT_EXPO });
+        }
+
+        // Custom smooth scroll using Framer Motion
+        animate(window.scrollY, elementPosition - offset, {
+          duration: TRANSITIONS.DURATION_SCROLL,
+          ease: TRANSITIONS.EASE_OUT_EXPO,
+          onUpdate: (latest) => window.scrollTo(0, latest)
+        });
+      }
     }
   };
 
@@ -78,25 +95,23 @@ export default function Navbar() {
     visible: { 
       x: 0, 
       transition: { 
-        type: "spring", 
-        stiffness: 300, 
-        damping: 25,
+        ...TRANSITIONS.SPRING_SNAPPY,
         staggerChildren: 0.04,
         delayChildren: 0.1
       } 
     },
-    exit: { x: "-100%", transition: { duration: 0.2, ease: "easeIn" } }
+    exit: { x: "-100%", transition: { duration: 0.15, ease: "easeIn" } }
   };
 
   const itemVariants = {
     hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 20 } }
+    visible: { opacity: 1, x: 0, transition: TRANSITIONS.SPRING_SNAPPY }
   };
 
   const backdropVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 }
+    visible: { opacity: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, transition: { duration: 0.15 } }
   };
 
   return (
